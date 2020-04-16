@@ -8,7 +8,8 @@ import Avatar from '@material-ui/core/Avatar'
 import { SearchInput } from '../components/SearchInput'
 import { Header } from '../components/Header'
 import { Table } from '../components/Table'
-import { usePagination } from '../hooks/usePagination'
+import { usePagination } from '../hooks/usePaginationTable'
+import { Loader } from '../components/Loader'
 
 const StyledTableRow = styled(TableRow)`
 	:nth-child(odd) {
@@ -19,6 +20,10 @@ const StyledTableRow = styled(TableRow)`
 const StyledTableCell = styled(TableCell)`
 	max-width: 200px;
 	word-break: break-all;
+`
+
+const StyledContainer = styled(Container)`
+	height: 100%;
 `
 
 type CreateDataProps = {
@@ -99,13 +104,13 @@ export const RepoFinder: FC = () => {
 	)
 
 	return (
-		<Container>
+		<StyledContainer>
 			<Header />
 			<SearchInput pageHandler={pageHandler} placeholder="Enter repository name" />
-			{loading && !tableRows.length && 'Loading...'}
+			{loading && !tableRows.length && <Loader />}
 			{!loading && (!!tableRows.length || total === 0) && (
 				<Table tableHead={tableHead} tableRows={tableRows} pages={pages} total={total} />
 			)}
-		</Container>
+		</StyledContainer>
 	)
 }

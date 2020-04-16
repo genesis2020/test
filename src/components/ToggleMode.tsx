@@ -1,10 +1,10 @@
 import React, { FC, useContext, useMemo } from 'react'
+import styled from 'styled-components'
 import { useTheme } from '@material-ui/core/styles'
 import Brightness2OutlinedIcon from '@material-ui/icons/Brightness2Outlined'
 import Brightness5Icon from '@material-ui/icons/Brightness5'
 import Box from '@material-ui/core/Box'
 import IconButton from '@material-ui/core/IconButton'
-import styled from 'styled-components'
 import { ModeContext } from '../context/ModeContext'
 
 const StyledIconButton = styled(IconButton)`

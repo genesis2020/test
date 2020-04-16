@@ -1,35 +1,19 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
+import { ThemeProvider } from '@material-ui/core/styles'
 import { StylesProvider } from '@material-ui/styles'
 import { ThemeProvider as StyledThemeProvider } from 'styled-components'
 import { ModeContext } from './context/ModeContext'
 import { App } from './containers/App'
+import { InfoPopupContext } from './context/InfoPopupContext'
+import { useInfoPopup } from './hooks/useInfoPopup'
+import { useMaterialTheme } from './hooks/useMaterialTheme'
+import './index.css'
 
 const Main = () => {
-	const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark')
-	const MuiTheme = useMemo(
-		() =>
-			createMuiTheme({
-				palette: {
-					type: themeMode,
-					primary: {
-						main: themeMode === 'dark' ? '#EEE' : '#111',
-					},
-					background: {
-						default: themeMode === 'dark' ? '#111' : '#EEE',
-					},
-				},
-				spacing: 8,
-			}),
-		[themeMode]
-	)
-
-	const toggleMode = useCallback(() => {
-		const newTheme = themeMode === 'dark' ? 'light' : 'dark'
-		setThemeMode(newTheme)
-	}, [themeMode])
+	const { infoPopupStatus, setInfoPopupStatus } = useInfoPopup()
+	const { MuiTheme, toggleMode } = useMaterialTheme()
 
 	return (
 		<ThemeProvider theme={MuiTheme}>
@@ -37,7 +21,9 @@ const Main = () => {
 				<CssBaseline />
 				<StylesProvider injectFirst>
 					<ModeContext.Provider value={{ toggleMode }}>
-						<App />
+						<InfoPopupContext.Provider value={{ infoPopupStatus, setInfoPopupStatus }}>
+							<App />
+						</InfoPopupContext.Provider>
 					</ModeContext.Provider>
 				</StylesProvider>
 			</StyledThemeProvider>

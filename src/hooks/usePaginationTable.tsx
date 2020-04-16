@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useMemo, ReactElement } from 'react'
+import React, { useState, useCallback, useMemo, ReactElement, useContext } from 'react'
 import parseLinkHeader from 'parse-link-header'
 import debounce from 'lodash/debounce'
 import parse from 'parse-link-header'
 import { useHttp } from './useHttp'
+import { InfoPopupContext } from '../context/InfoPopupContext'
 
 export type UsePaginationReturn = {
 	pageHandler: (url: string, value?: string) => void
@@ -28,6 +29,7 @@ export const usePagination = (
 	const [currentPage, setCurrentPage] = useState(1)
 	const [searchValue, setSearchValue] = useState('')
 	const [timer, setTimer] = useState(500)
+	const { setInfoPopupStatus } = useContext(InfoPopupContext)
 	const { loading, request } = useHttp()
 
 	const pageHandler = useCallback(
@@ -54,8 +56,7 @@ export const usePagination = (
 					data = entity[inputValue][nextPage]
 				}
 			} catch (e) {
-				// handle ui error
-				throw Error(e)
+				setInfoPopupStatus({ isOpen: true, message: e.message, severity: 'error' })
 			}
 
 			setEntity({
@@ -79,7 +80,7 @@ export const usePagination = (
 
 	const pages = useMemo(
 		() =>
-			Object.entries(entity?.[searchValue]?.[currentPage].links ?? {}).map(([key, value]: any) => (
+			Object.entries(entity?.[searchValue]?.[currentPage]?.links ?? {}).map(([key, value]: any) => (
 				<button key={key} onClick={() => onClickHandler(value.url)}>
 					{key}
 				</button>
@@ -87,13 +88,13 @@ export const usePagination = (
 		[currentPage, entity, onClickHandler, searchValue]
 	)
 
-	const tableData = useMemo(() => entity?.[searchValue]?.[currentPage].data.items ?? [], [
+	const tableData = useMemo(() => entity?.[searchValue]?.[currentPage]?.data?.items ?? [], [
 		currentPage,
 		entity,
 		searchValue,
 	])
 
-	const total = useMemo(() => entity?.[searchValue]?.[currentPage].data.total_count ?? null, [
+	const total = useMemo(() => entity?.[searchValue]?.[currentPage]?.data?.total_count ?? null, [
 		currentPage,
 		entity,
 		searchValue,

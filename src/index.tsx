@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
 import { StylesProvider } from '@material-ui/styles'
+import { ThemeProvider as StyledThemeProvider } from 'styled-components'
 import { App } from './components/App'
 import { ModeContext } from './context/ModeContext'
 
@@ -20,6 +21,7 @@ const Main = () => {
 						default: themeMode === 'dark' ? '#111' : '#EEE',
 					},
 				},
+				spacing: 8,
 			}),
 		[themeMode]
 	)
@@ -31,12 +33,14 @@ const Main = () => {
 
 	return (
 		<ThemeProvider theme={MuiTheme}>
-			<CssBaseline />
-			<StylesProvider injectFirst>
-				<ModeContext.Provider value={{ toggleMode }}>
-					<App />
-				</ModeContext.Provider>
-			</StylesProvider>
+			<StyledThemeProvider theme={MuiTheme}>
+				<CssBaseline />
+				<StylesProvider injectFirst>
+					<ModeContext.Provider value={{ toggleMode }}>
+						<App />
+					</ModeContext.Provider>
+				</StylesProvider>
+			</StyledThemeProvider>
 		</ThemeProvider>
 	)
 }

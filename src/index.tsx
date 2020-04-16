@@ -4,8 +4,8 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
 import { StylesProvider } from '@material-ui/styles'
 import { ThemeProvider as StyledThemeProvider } from 'styled-components'
-import { App } from './components/App'
 import { ModeContext } from './context/ModeContext'
+import { App } from './containers/App'
 
 const Main = () => {
 	const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark')

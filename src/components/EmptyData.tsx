@@ -7,7 +7,7 @@ const StyledBox = styled(Box)`
 	align-items: center;
 	justify-content: center;
 	font-size: ${({ theme }) => `${theme.spacing(3)}px`};
-	height: 50%;
+	padding-top: ${({ theme }) => `${theme.spacing(5)}px`};
 `
 
 export const EmptyData: FC = () => <StyledBox>No data found</StyledBox>

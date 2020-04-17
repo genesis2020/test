@@ -27,6 +27,7 @@ export type UsePaginationReturn = {
 	loading: boolean
 	pages: PagesType
 	tableData: any[]
+	currentPage: number
 	total: number
 }
 
@@ -130,6 +131,7 @@ export const usePagination = (
 		loading,
 		pages,
 		tableData,
+		currentPage,
 		total,
 	}
 }

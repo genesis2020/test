@@ -12,6 +12,9 @@ export const useMaterialTheme = () => {
 					primary: {
 						main: themeMode === 'dark' ? '#EEE' : '#111',
 					},
+					secondary: {
+						main: themeMode === 'dark' ? '#112' : '#BEF',
+					},
 					background: {
 						default: themeMode === 'dark' ? '#111' : '#EEE',
 					},

@@ -1,16 +1,22 @@
-import React, { FC, useState, useMemo } from 'react'
+import React, { FC, useState, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
+import truncate from 'lodash/truncate'
+import { useTheme, Theme } from '@material-ui/core/styles'
 import Link from '@material-ui/core/Link'
 import Container from '@material-ui/core/Container'
 import Avatar from '@material-ui/core/Avatar'
+import { Column } from 'material-table'
 import { SearchInput } from '../components/SearchInput'
 import { Header } from '../components/Header'
 import { Table } from '../components/Table'
 import { usePagination } from '../hooks/usePaginationTable'
 import { Loader } from '../components/Loader'
+import { ITEMS_PER_PAGE, TRUNCATE_OPTIONS } from '../common/const'
 
 const StyledContainer = styled(Container)`
-	height: 100%;
+	display: flex;
+	flex-direction: column;
+	padding-bottom: ${({ theme }) => theme.spacing(7)}px;
 `
 
 type CreateDataProps = {
@@ -33,13 +39,6 @@ type CreateDataReturn = Pick<
 	login: string
 }
 
-type TableHeadRow = {
-	title: string
-	field: string
-	sorting?: boolean
-	render?: (row: CreateDataReturn) => void
-}
-
 const createData = ({
 	id,
 	name,
@@ -50,72 +49,118 @@ const createData = ({
 }: CreateDataProps): CreateDataReturn => ({
 	id,
 	avatar_url,
-	login,
-	name,
-	description,
+	login: truncate(login, TRUNCATE_OPTIONS),
+	name: truncate(name, TRUNCATE_OPTIONS),
+	description: truncate(description, TRUNCATE_OPTIONS),
 	html_url,
 	stargazers_count,
 })
 
+type TableHeadGeneratorType = (theme: Theme) => Column<CreateDataReturn>[]
+
 const rows = (tableData: any) => tableData.map(createData)
-const tableHead: TableHeadRow[] = [
-	{
-		title: 'Avatar',
-		field: 'avatar_url',
-		sorting: false,
-		render: (row) => <Avatar alt={row.login} src={row.avatar_url} />,
-	},
-	{ title: 'Login', field: 'login', sorting: false },
-	{ title: 'Repository name', field: 'name', sorting: false },
-	{ title: 'Description', field: 'description', sorting: false },
-	{
-		title: 'Link',
-		field: 'html_url',
-		sorting: false,
-		render: (row) => (
-			<Link href={row.html_url} target="_blank">
-				{row.html_url}
-			</Link>
-		),
-	},
-	{
-		title: 'Stars',
-		field: 'stargazers_count',
-	},
-]
+const tableHeadGenerator: TableHeadGeneratorType = (theme) => {
+	return [
+		{
+			title: 'Avatar',
+			field: 'avatar_url',
+			width: '10%',
+			sorting: false,
+			headerStyle: {
+				backgroundColor: theme.palette.secondary.main,
+			},
+			render: (row) => <Avatar alt={row.login} src={row.avatar_url} />,
+		},
+		{
+			title: 'Login',
+			field: 'login',
+			width: '15%',
+			sorting: false,
+			cellStyle: { wordBreak: 'break-all' },
+			headerStyle: {
+				backgroundColor: theme.palette.secondary.main,
+			},
+		},
+		{
+			title: 'Repository name',
+			field: 'name',
+			width: '15%',
+			sorting: false,
+			cellStyle: { wordBreak: 'break-all' },
+			headerStyle: {
+				backgroundColor: theme.palette.secondary.main,
+			},
+		},
+		{
+			title: 'Description',
+			field: 'description',
+			width: '25%',
+			sorting: false,
+			cellStyle: { wordBreak: 'break-all' },
+			headerStyle: {
+				backgroundColor: theme.palette.secondary.main,
+			},
+		},
+		{
+			title: 'Link',
+			field: 'html_url',
+			width: '25%',
+			sorting: false,
+			headerStyle: {
+				backgroundColor: theme.palette.secondary.main,
+			},
+			cellStyle: { wordBreak: 'break-all' },
+			render: (row) => (
+				<Link href={row.html_url} target="_blank">
+					{row.html_url}
+				</Link>
+			),
+		},
+		{
+			title: 'Stars',
+			field: 'stargazers_count',
+			width: '10%',
+			headerStyle: {
+				textAlign: 'right',
+				backgroundColor: theme.palette.secondary.main,
+			},
+			cellStyle: { textAlign: 'right', wordBreak: 'break-all' },
+		},
+	]
+}
 
 export const RepoFinder: FC = () => {
 	const [repos, setRepos] = useState({})
-	const { pageHandler, pages, tableData, loading, total } = usePagination(repos, setRepos)
-	const tableRows = useMemo(
-		() =>
-			rows(tableData).map(
-				({
-					avatar_url,
-					login,
-					name,
-					description,
-					stargazers_count,
-					html_url,
-				}: CreateDataReturn) => ({
-					avatar_url,
-					login,
-					name,
-					description,
-					html_url,
-					stargazers_count,
-				})
-			),
-		[tableData]
+	const theme = useTheme()
+	const tableHead = tableHeadGenerator(theme)
+	const { pageHandler, pages, tableData, loading, total, currentPage } = usePagination(
+		repos,
+		setRepos
 	)
+	const reposUrl = useCallback(
+		(inputValue: string) =>
+			`https://api.github.com/search/repositories?q=${inputValue}&&per_page=${ITEMS_PER_PAGE}&&sort=stars`,
+		[]
+	)
+	const tableRows = useMemo(() => rows(tableData), [tableData])
 
 	return (
 		<StyledContainer>
 			<Header />
-			<SearchInput pageHandler={pageHandler} placeholder="Enter repository name" />
+			<SearchInput
+				pageHandler={pageHandler}
+				placeholder="Enter repository name"
+				getUrl={reposUrl}
+			/>
 			{loading && !tableRows.length && <Loader />}
 			{!loading && (!!tableRows.length || total === 0) && (
-				<Table tableHead={tableHead} tableRows={tableRows} pages={pages} total={total} />
+				<Table
+					tableHead={tableHead}
+					tableRows={tableRows}
+					pages={pages}
+					total={total}
+					currentPage={currentPage}
+				/>
 			)}
 		</StyledContainer>
 	)

@@ -12,18 +12,19 @@ const SearchField = styled(TextField)`
 type SearchInputProps = {
 	pageHandler: (url: string, inputValue: string) => void
 	placeholder: string
+	getUrl: (value: string) => string
 }
 
-export const SearchInput: FC<SearchInputProps> = ({ pageHandler, placeholder }) => {
+export const SearchInput: FC<SearchInputProps> = ({ pageHandler, placeholder, getUrl }) => {
 	const [value, setValue] = useState('')
 	const onChange = useCallback(
 		async (e) => {
 			const inputValue = e.target.value
 			setValue(inputValue)
-			const url = `https://api.github.com/search/repositories?q=${inputValue}&&per_page=30`
+			const url = getUrl(inputValue)
 			pageHandler(url, inputValue)
 		},
-		[pageHandler, setValue]
+		[pageHandler, getUrl]
 	)
 
 	return (

@@ -1,4 +1,7 @@
 export const DEBOUNCE_TIMER = 500
+export const ITEMS_PER_PAGE = 30
+export const STRING_MAX_LENGTH = 120
+export const TRUNCATE_OPTIONS = { length: STRING_MAX_LENGTH, separator: /,? +/ }
 
 export type PageIconsType = 'chevron_right' | 'chevron_left' | 'last_page' | 'first_page'
 
